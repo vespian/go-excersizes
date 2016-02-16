@@ -26,9 +26,6 @@ func main() {
 	if filepath != "" {
 		f := algos.Str2funcMapping[algo]
 		img := img.BuildImg(width, height, scaling, f)
-		// (sur) If we close a buffered channel with messages in the buffer,
-		// do we lose them or are they going to be consumed by the other end and
-		// then it notices that ch is closed ?
 		cmdline.WriteImg(img, filepath)
 	}
 
