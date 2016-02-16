@@ -19,9 +19,6 @@ import (
 	"github.com/vespian/go-excersizes/fractal_graphing/img"
 )
 
-// TODO:
-// - split into separate files
-
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	width, height, scaling, filepath, ssocket, algo := cmdline.GetCmdline()
