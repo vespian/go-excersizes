@@ -41,7 +41,14 @@ func breadcrumb2len(b string) uint8 {
 	return uint8(len(strings.Split(b, "/")))
 }
 
-func parse_file(path string) (out chan []string, free_buffers chan []string) {
+func fileParser(path string) (out chan []string, free_buffers chan []string) {
+	// Take a file pointed by path argument, split it into PACKET_LEN lines
+	// "packages" and send each one to "out" channel. In order to not to strain
+	// GC to much, we reuse the buffers - only limited number of them is created
+	// during start, later they are "returned" by goroutines processing the
+	// them using "free_buffers" channel.
+
+	//(sur) Is this model/approach optimal ?
 	out = make(chan []string, BUF_PACKETS)
 	free_buffers = make(chan []string, BUF_PACKETS)
 	for i := 0; i < BUF_PACKETS-1; i++ {
@@ -96,7 +103,14 @@ func parse_file(path string) (out chan []string, free_buffers chan []string) {
 	return out, free_buffers
 }
 
-func parse_breadcrumbs(in <-chan []string, free_buffers chan<- []string) chan FreqHash {
+func parseBreadcrumbs(input_ch <-chan []string,
+	free_buffers_ch chan<- []string) chan FreqHash {
+	// Paring/regexpes is the most CPU-intensive task here, each go-routine
+	// processes a buffer/package prepared by goroutines spawned by fileParser()
+	// and then returns back the buffer.
+	// The goroutine aggregates data about breadcrumbs/number of shashes locally
+	// and when there is no more data, it sends it to output channel to the
+	// goroutine that aggregates it into one big hash.
 	var wg sync.WaitGroup
 	out := make(chan FreqHash, BUF_PACKETS)
 
@@ -107,7 +121,7 @@ func parse_breadcrumbs(in <-chan []string, free_buffers chan<- []string) chan Fr
 		var t_counted int
 		var num_bredc uint8
 
-		for buf := range in {
+		for buf := range input_ch {
 			for _, s := range buf {
 				if s == "" {
 					continue
@@ -121,11 +135,13 @@ func parse_breadcrumbs(in <-chan []string, free_buffers chan<- []string) chan Fr
 				t_counted += 1
 				res[num_bredc] += 1
 			}
-			free_buffers <- buf
+			free_buffers_ch <- buf
 		}
 		out <- res
-		fmt.Printf("routine: %d - processed %d\n", gorun_number, t_processed)
-		fmt.Printf("routine: %d - counted %d\n", gorun_number, t_counted)
+		fmt.Printf("goroutine: %d - processed lines %d\n", gorun_number,
+			t_processed)
+		fmt.Printf("goroutine: %d - breadcrumbs found %d\n", gorun_number,
+			t_counted)
 		wg.Done()
 	}
 
@@ -140,10 +156,11 @@ func parse_breadcrumbs(in <-chan []string, free_buffers chan<- []string) chan Fr
 	}()
 
 	return out
-
 }
 
-func count_breadcrumbs(in <-chan FreqHash) FreqHash {
+func aggregateBreadcrumbs(in <-chan FreqHash) FreqHash {
+	// This functin aggregates the data produced by parseBreadcrumbs() goroutines
+	// and outputs an aggregated map with all lengths found in the input file.
 	res := make(FreqHash)
 	var t uint64
 
@@ -153,7 +170,7 @@ func count_breadcrumbs(in <-chan FreqHash) FreqHash {
 			t += val
 		}
 	}
-	fmt.Println("map-counted: ", t)
+	fmt.Println("counted total: ", t)
 	return res
 }
 
@@ -174,7 +191,7 @@ func print_histogram(h FreqHash) {
 	}
 }
 
-func get_average_breadcrumblen(h FreqHash) float64 {
+func getAverageBreadcrumbLen(h FreqHash) float64 {
 	var sum_total float64
 	var sum_weighted float64
 
@@ -185,6 +202,14 @@ func get_average_breadcrumblen(h FreqHash) float64 {
 
 	return (sum_weighted / sum_total)
 
+}
+
+func getCmdline() (path string) {
+	flag.StringVar(&path, "path", "./structure.rdf.u8",
+		"the path to file to process")
+	flag.Parse()
+
+	return
 }
 
 func main() {
@@ -200,16 +225,16 @@ func main() {
 	// defer p.Stop()
 	NUM_THREADS = runtime.NumCPU()
 
+	input_file_path := getCmdline()
+
 	runtime.GOMAXPROCS(NUM_THREADS)
 
-	var path string
-	flag.StringVar(&path, "path", "./dupa.txt", "the path to file to process")
-	flag.Parse()
-
-	out, free_buffers := parse_file(path)
-	bread_crumbs := parse_breadcrumbs(out, free_buffers)
-	freq_hash := count_breadcrumbs(bread_crumbs)
-	average := get_average_breadcrumblen(freq_hash)
-	fmt.Printf("Average len: %.2f\n", average)
-	print_histogram(freq_hash)
+	// Let's create a processing pipeline!
+	// Please see functions' comments for detailed info.
+	file_ch, free_buffers_ch := fileParser(input_file_path)
+	bread_crumbs_ch := parseBreadcrumbs(file_ch, free_buffers_ch)
+	breakcrumb_freq_hash := aggregateBreadcrumbs(bread_crumbs_ch)
+	average_breadcrumb_len := getAverageBreadcrumbLen(breakcrumb_freq_hash)
+	fmt.Printf("Average len: %.2f\n", average_breadcrumb_len)
+	print_histogram(breakcrumb_freq_hash)
 }
