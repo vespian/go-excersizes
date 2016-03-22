@@ -1,4 +1,4 @@
-#fractal_graphing#
+#fractals#
 An excercise from "Go Programming Language" book: p. 62, ex.3.5-3.9
 
 The program itself generates images of few simple equations/fractals (check

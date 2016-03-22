@@ -5,18 +5,18 @@
 // which can be found at:
 // https://github.com/adonovan/gopl.io.git
 
-// Mandelbrot emits a PNG image of the Mandelbrot fractal.
+// Package algos groups functions used for calculating fractals
 package algos
 
-import "math/cmplx"
+import (
+	"fmt"
+	"math/cmplx"
+)
 
-//(sur) Is it a problem that I make func type private and at the same time
-// map using it public ?
+// AlgoFunc is the signature of the fuctions used for generating fractals
 type AlgoFunc func(r, i float64) (uint8, uint8)
 
-// (sur) Is there a way to do _getattr_ in a simple way ? Or is the "map"
-// approach idiomatic enough ?
-var Str2funcMapping = map[string]AlgoFunc{
+var str2funcMapping = map[string]AlgoFunc{
 	"newton":         Newton,
 	"acos":           Acos,
 	"mandelbrotC64":  MandelbrotC64,
@@ -24,12 +24,30 @@ var Str2funcMapping = map[string]AlgoFunc{
 	"sqrt":           Sqrt,
 }
 
-// Mandelbrot algo, but with complex128 type resolution
+// MapStr2Func converts string name of the fractal generator into a reference
+// of the function implementing it.
+func MapStr2Func(algo string) (AlgoFunc, error) {
+	var val AlgoFunc
+
+	if _, ok := str2funcMapping[algo]; !ok {
+		msg := "algorithm must be one of: \n"
+		for key := range str2funcMapping {
+			msg += fmt.Sprintf(" - %s\n", key)
+		}
+		msg += fmt.Sprintf("Given: %s\n", algo)
+		return nil, fmt.Errorf(msg)
+	}
+	return val, nil
+}
+
+// MandelbrotC128 calculates pixel values for Mandelbrot fractal using
+// complex128 type.
 func MandelbrotC128(r, i float64) (uint8, uint8) {
-	var z complex128 = complex(r, i)
 	const iterations = 20000
 
 	var v complex128
+	z := complex(r, i)
+
 	for n := 0; n < iterations; n++ {
 		v = v*v + z
 		if cmplx.Abs(v) > 2 {
@@ -41,12 +59,14 @@ func MandelbrotC128(r, i float64) (uint8, uint8) {
 	return 0, 0
 }
 
-// Mandelbrot algo, but with complex64 type resolution
+// MandelbrotC64 calculates pixel values for Mandelbrot fractal using
+// complex64 type(at least tries to :) ).
 func MandelbrotC64(r, i float64) (uint8, uint8) {
-	var z complex64 = complex(float32(r), float32(i))
 	const iterations = 20000
 
 	var v complex64
+	z := complex(float32(r), float32(i))
+
 	for n := 0; n < iterations; n++ {
 		v = v*v + z
 		//(sur) I have not found a better way, golang seems to support only
@@ -60,6 +80,7 @@ func MandelbrotC64(r, i float64) (uint8, uint8) {
 	return 0, 0
 }
 
+// Acos calculates pixel values for arcus-cosinus fractal.
 func Acos(r, i float64) (uint8, uint8) {
 	z := complex(r, i)
 	v := cmplx.Acos(z)
@@ -68,6 +89,7 @@ func Acos(r, i float64) (uint8, uint8) {
 	return blue, red
 }
 
+// Sqrt calculates pixel values for sqrt fractal.
 func Sqrt(r, i float64) (uint8, uint8) {
 	z := complex(r, i)
 	v := cmplx.Sqrt(z)
@@ -76,6 +98,8 @@ func Sqrt(r, i float64) (uint8, uint8) {
 	return blue, red
 }
 
+// Newton calculates pixel values for Newton's method of finding minimas.
+//
 // f(x) = x^4 - 1
 //
 // z' = z - f(z)/f'(z)
