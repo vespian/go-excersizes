@@ -22,7 +22,7 @@ import (
 	"github.com/vespian/go-exercises/fractals/img"
 )
 
-// ServeHTTP responds with a PNG image of a fractal to the client.
+// ServeHTTP responds with a PNG image of desired fractal to the client.
 func ServeHTTP(rW http.ResponseWriter, r *http.Request) {
 	var err error
 
@@ -81,8 +81,6 @@ func parseHTTPReqdata(r *http.Request) (*cmdline.ImgParams, error) {
 		return nil, rErr
 	}
 
-	//(sur) Is there simpler/more idiomatic way to parse headers, or should
-	// I just parse them one by one and check the error status ?
 	if tmp, ok = r.Form["width"]; ok {
 		imgP.Width, err = strconv.Atoi(tmp[0])
 		if err != nil {

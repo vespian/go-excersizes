@@ -9,16 +9,16 @@
 // variants.
 package constants
 
-// XMin - begining of X axis
+// XMin marks the begining of X axis
 const XMin = -2.2
 
-// YMin - begining of Y axis
+// YMin marks the begining of Y axis
 const YMin = -1.1
 
-// XMax - end of x axis
+// XMax marks the end of x axis
 const XMax = 2.2
 
-// YMax - end of Y axis
+// YMax marks the end of Y axis
 const YMax = 1.1
 
 // TileSize defines a basic unit of processing in pixels. Resulting image is
