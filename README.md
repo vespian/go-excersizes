@@ -1,2 +1,2 @@
-# go-excersizes
+# go-exercises
 Fun with go
