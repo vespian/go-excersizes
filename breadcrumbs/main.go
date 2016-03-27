@@ -46,9 +46,15 @@ func breadcrumbToLen(b string) uint8 {
 // to not to strain GC to much, we reuse the buffers - only limited number
 // of them is created during start, later they are "returned" by goroutines
 // processing the them using "freeBuffers" channel.
-func fileParser(path string, errch chan<- error) (chan []string, chan []string) {
-	out := make(chan []string, bufPackets)
-	freeBuffers := make(chan []string, bufPackets)
+func fileParser(
+	path string,
+	errch chan<- error,
+) (
+	out chan []string,
+	freeBuffers chan []string,
+) {
+	out = make(chan []string, bufPackets)
+	freeBuffers = make(chan []string, bufPackets)
 
 	for i := 0; i < bufPackets; i++ {
 		freeBuffers <- make([]string, packetLen, packetLen)

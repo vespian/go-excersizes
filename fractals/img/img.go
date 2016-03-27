@@ -126,7 +126,7 @@ func calculateSupersampledPoint(
 	y, x, yDelta, xDelta float64,
 	algo algos.AlgoFunc,
 ) (
-	uint8, uint8,
+	blue, red uint8,
 ) {
 	// Here's where the supersampling magic hapens:
 	var acumulatorBlue, acumulatorRed int64

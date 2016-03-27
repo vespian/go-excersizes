@@ -14,7 +14,7 @@ import (
 )
 
 // AlgoFunc is the signature of the fuctions used for generating fractals
-type AlgoFunc func(r, i float64) (uint8, uint8)
+type AlgoFunc func(r, i float64) (blue, red uint8)
 
 var str2funcMapping = map[string]AlgoFunc{
 	"newton":         Newton,
@@ -42,7 +42,7 @@ func MapStr2Func(algo string) (AlgoFunc, error) {
 
 // MandelbrotC128 calculates pixel values for Mandelbrot fractal using
 // complex128 type.
-func MandelbrotC128(r, i float64) (uint8, uint8) {
+func MandelbrotC128(r, i float64) (blue, red uint8) {
 	const iterations = 20000
 
 	var v complex128
@@ -61,7 +61,7 @@ func MandelbrotC128(r, i float64) (uint8, uint8) {
 
 // MandelbrotC64 calculates pixel values for Mandelbrot fractal using
 // complex64 type(at least tries to :) ).
-func MandelbrotC64(r, i float64) (uint8, uint8) {
+func MandelbrotC64(r, i float64) (blue, red uint8) {
 	const iterations = 20000
 
 	var v complex64
@@ -81,20 +81,20 @@ func MandelbrotC64(r, i float64) (uint8, uint8) {
 }
 
 // Acos calculates pixel values for arcus-cosinus fractal.
-func Acos(r, i float64) (uint8, uint8) {
+func Acos(r, i float64) (blue, red uint8) {
 	z := complex(r, i)
 	v := cmplx.Acos(z)
-	blue := uint8(real(v)*128) + 127
-	red := uint8(imag(v)*128) + 127
+	blue = uint8(real(v)*128) + 127
+	red = uint8(imag(v)*128) + 127
 	return blue, red
 }
 
 // Sqrt calculates pixel values for sqrt fractal.
-func Sqrt(r, i float64) (uint8, uint8) {
+func Sqrt(r, i float64) (blue, red uint8) {
 	z := complex(r, i)
 	v := cmplx.Sqrt(z)
-	blue := uint8(real(v)*128) + 127
-	red := uint8(imag(v)*128) + 127
+	blue = uint8(real(v)*128) + 127
+	red = uint8(imag(v)*128) + 127
 	return blue, red
 }
 

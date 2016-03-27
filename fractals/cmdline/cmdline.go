@@ -121,8 +121,9 @@ func Cmdline() *CommandlineArgs {
 }
 
 // WriteImg writes given image to a file.
-func WriteImg(img *image.RGBA, filepath string) (err error) {
+func WriteImg(img *image.RGBA, filepath string) error {
 	var f *os.File
+	var err error
 
 	if f, err = os.Create(filepath); err != nil {
 		return errors.New("couldn't open file: " + err.Error())
