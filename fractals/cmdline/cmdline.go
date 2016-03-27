@@ -66,18 +66,18 @@ func parseCmdline() *CommandlineArgs {
 func validateCmdline(cmd *CommandlineArgs) {
 	switch {
 	case cmd.Filepath == "" && cmd.Ssocket == "":
-		cmd.Err = fmt.Errorf("Either path to an output file or server socket " +
+		cmd.Err = fmt.Errorf("either path to an output file or server socket " +
 			"must be specified")
 		return
 
 	case cmd.Filepath != "" && cmd.Ssocket != "":
-		cmd.Err = fmt.Errorf("Filepath and ssocket are mutually exclusive\n")
+		cmd.Err = fmt.Errorf("filepath and ssocket are mutually exclusive\n")
 		return
 
 	case cmd.Filepath != "":
 		err := ValidateImgParams(&cmd.ImgParams)
 		if err != nil {
-			cmd.Err = fmt.Errorf("Img params are invalid: %s", err)
+			cmd.Err = fmt.Errorf("img params are invalid: %s", err)
 			return
 		}
 		// Image params validation for HTTP server occurs during req. processing
@@ -87,7 +87,7 @@ func validateCmdline(cmd *CommandlineArgs) {
 // ValidateImgParams validates desired output image parameters.
 func ValidateImgParams(imgP *ImgParams) error {
 	if imgP.Width%constants.TileSize != 0 || imgP.Height%constants.TileSize != 0 {
-		return fmt.Errorf("Width(%d) and height(%d) of the resulting picture"+
+		return fmt.Errorf("width(%d) and height(%d) of the resulting picture"+
 			" should be multiples of tile size(%d)\n", imgP.Width,
 			imgP.Height, constants.TileSize)
 	}
@@ -96,13 +96,13 @@ func ValidateImgParams(imgP *ImgParams) error {
 	ratioPxPy := float64(imgP.Height) / float64(imgP.Width)
 	if ratioXY != ratioPxPy {
 		sugestedWidth := int(float64(imgP.Height) / ratioXY)
-		msgFmt := "Pixel ratio (%2.2f) differs from XY ratio(%2.2f), try" +
+		msgFmt := "pixel ratio (%2.2f) differs from XY ratio(%2.2f), try" +
 			" adjusting width to %d\n\n"
 		return fmt.Errorf(msgFmt, ratioPxPy, ratioXY, sugestedWidth)
 	}
 
 	if imgP.Scaling < 1 {
-		msgFmt := "Scaling factor must be >= 1, currently: `%d`\n"
+		msgFmt := "scaling factor must be >= 1, currently: `%d`\n"
 		return fmt.Errorf(msgFmt, imgP.Scaling)
 	}
 
@@ -125,7 +125,7 @@ func WriteImg(img *image.RGBA, filepath string) (err error) {
 	var f *os.File
 
 	if f, err = os.Create(filepath); err != nil {
-		return errors.New("Couldn't open file: " + err.Error())
+		return errors.New("couldn't open file: " + err.Error())
 	}
 	defer func() {
 		if cerr := f.Close(); cerr != nil && err == nil {

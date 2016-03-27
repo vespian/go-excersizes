@@ -72,7 +72,7 @@ func fileParser(path string, errch chan<- error) (chan []string, chan []string) 
 		}()
 
 		if file, err = os.Open(path); err != nil {
-			err = fmt.Errorf("Failed to open breadc file for "+
+			err = fmt.Errorf("failed to open breadc file for "+
 				"reading: %s", err)
 			return
 		}
@@ -161,8 +161,9 @@ func parseBreadcrumbs(inputCh <-chan []string,
 	return out
 }
 
-// Function aggregateBreadcrumbs aggregates the data produced by parseBreadcrumbs() goroutines
-// and outputs an aggregated map with all lengths found in the input file.
+// Function aggregateBreadcrumbs aggregates the data produced by parseBreadcrumbs()
+// goroutines and outputs an aggregated map with all lengths found in the input
+// file.
 func aggregateBreadcrumbs(in <-chan freqHash) chan freqHash {
 	resCh := make(chan freqHash)
 

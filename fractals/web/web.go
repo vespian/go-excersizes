@@ -42,7 +42,7 @@ func ServeHTTP(rW http.ResponseWriter, r *http.Request) {
 
 	err = png.Encode(rW, imgRes) // NOTE: ignoring errors
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Err while sending image to client: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error while sending image to client: %v\n", err)
 	}
 }
 
@@ -77,7 +77,7 @@ func parseHTTPReqdata(r *http.Request) (*cmdline.ImgParams, error) {
 	}
 
 	if err = r.ParseForm(); err != nil {
-		rErr := fmt.Errorf("Form parsing error: %v", err)
+		rErr := fmt.Errorf("form parsing error: %v", err)
 		return nil, rErr
 	}
 

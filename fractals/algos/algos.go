@@ -30,11 +30,11 @@ func MapStr2Func(algo string) (AlgoFunc, error) {
 	var val AlgoFunc
 
 	if _, ok := str2funcMapping[algo]; !ok {
-		msg := "algorithm must be one of: \n"
+		msg := "algorithm must be one of:"
 		for key := range str2funcMapping {
-			msg += fmt.Sprintf(" - %s\n", key)
+			msg += fmt.Sprintf(" %s,", key)
 		}
-		msg += fmt.Sprintf("Given: %s\n", algo)
+		msg += fmt.Sprintf(" Given: %s", algo)
 		return nil, fmt.Errorf(msg)
 	}
 	return val, nil
