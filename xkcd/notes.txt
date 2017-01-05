@@ -1,0 +1,6 @@
+xkcd -idx-type (json/protobuf) -index-file (index.json|index.protobuf)
+    -op fetch -min -max -xkcd-uri http://dupa.pl/dupa/maryna
+xkcd -idx-type (json/protobuf) -index-file (index.json|index.protobuf)
+    -op list -min -max
+xkcd -idx-type (json/protobuf) -index-file (index.json|index.protobuf)
+    -op search (dupa|fieldname:dupa)
