@@ -1,0 +1,20 @@
+syntax = "proto3";
+package pbuff;
+
+message PBStory {
+    string Alt = 1;
+    int32 Day = 2;
+    string Img = 3;
+    string Link = 4;
+    int32 Month = 5;
+    string News = 6;
+    int64 Num = 7;
+    string SafeTitle = 8;
+    string Title = 9;
+    string Transcript = 10;
+    int32 Year = 11;
+}
+
+message PBAllStories {
+  map<int64, PBStory> Data = 1;
+}
